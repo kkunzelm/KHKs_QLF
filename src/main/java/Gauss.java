@@ -1,8 +1,8 @@
 
-public class Gauss {
+class Gauss {
 
-	float[][] matrix = new float[3][4];
-	float[] coeffs = new float[3];
+	private final float[][] matrix = new float[3][4];
+	private final float[] coeffs = new float[3];
 
 	/**
 	 * Contructs a new Object.
@@ -44,7 +44,7 @@ public class Gauss {
 	/*
 	 * Just for testing.
 	 */
-	public static void main(String argv[]) {
+	public static void main(String[] argv) {
 
 		Gauss g = new Gauss(1, 1, 3, 1, 1, 3);
 		// Gauss g = new Gauss(12,2,14,2,12,4);
@@ -113,7 +113,7 @@ public class Gauss {
 		return c;
 	}
 
-	void printMatrix() {
+	private void printMatrix() {
 		System.out.println(matrix[0][0] + "*C1 + " + matrix[0][1] + "*C2 + " + matrix[0][2] + "*C3 = " + matrix[0][3]);
 		System.out.println(matrix[1][0] + "*C1 + " + matrix[1][1] + "*C2 + " + matrix[1][2] + "*C3 = " + matrix[1][3]);
 		System.out.println(matrix[2][0] + "*C1 + " + matrix[2][1] + "*C2 + " + matrix[2][2] + "*C3 = " + matrix[2][3]);

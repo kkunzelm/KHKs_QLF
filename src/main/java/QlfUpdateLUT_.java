@@ -15,7 +15,7 @@ import ij.process.ImageStatistics;
 
 public class QlfUpdateLUT_ implements PlugInFilter {
 
-	static ImagePlus orgImg;
+	private static ImagePlus orgImg;
 
 	public int setup(String arg, ImagePlus imp) {
 		orgImg = imp;
@@ -24,10 +24,8 @@ public class QlfUpdateLUT_ implements PlugInFilter {
 
 	public void run(ImageProcessor ip) {
 
-		boolean isByte = false;
 		if (orgImg.getType() == ImagePlus.GRAY8) {
 			ip = ip.convertToFloat(); // if its 8-bit make 32-bit (methods ONLY running on float!)
-			isByte = true; // for converting back if needed
 		}
 
 		ImageProcessor floatProcessor = orgImg.getProcessor();

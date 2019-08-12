@@ -16,8 +16,6 @@
  *
  */
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.TreeMap;
 
 import javax.swing.*;
@@ -31,11 +29,8 @@ import ij.text.TextPanel;
 
 public class QlfStatistics_Stack implements PlugInFilter {
 
-	ImagePlus imp;
-	ImageStack img1;
-
-	TreeMap quantilMap = new TreeMap();
-	int stackSize;
+	private ImagePlus imp;
+	private final TreeMap<Integer, Float> quantilMap = new TreeMap<>();
 
 	public int setup(String arg, ImagePlus imp) {
 		this.imp = imp;
@@ -121,8 +116,6 @@ public class QlfStatistics_Stack implements PlugInFilter {
 
 		// Generate histogram
 
-		float binSize = (max - min) / nBins;
-
 		double scale = nBins / (max - min);
 		int index;
 		int n = posp + negp + zero; // pixel count = number of defined pixels
@@ -181,8 +174,8 @@ public class QlfStatistics_Stack implements PlugInFilter {
 
 		int[] q = {1, 2, 5, 10, 20, 25, 50, 75, 80, 90, 95, 98, 99};
 
-		for (int j = 0; j < q.length; j++) {
-			quantilMap.put(new Integer(q[j]), new Integer(0));
+		for (int item : q) {
+			quantilMap.put(item, 0f);
 		}
 
 		// determine the quantiles as defined in the quantil map
@@ -191,7 +184,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 
 		// q = Anzahl der einzelnen Quantile - siehe in Quantilmap oben
 
-		for (int j = 0; j < q.length; j++) {
+		for (int value : q) {
 
 			// Variable i entspricht dem einzelnen Wert (Pixel) im sortierten Array des
 			// Float-Bildes
@@ -201,7 +194,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 			// ich muss aber die L�nge der definierten Pixel noch bestimmen, damit NaN nicht
 			// in die Quantilen einbezogen wird.
 
-			double qpr = (q[j] * (negp + posp + zero) / 100);
+			double qpr = (value * (negp + posp + zero) / 100.0);
 			for (int i = 0; i < qpr; i++) {
 
 				// oldValue war mit Null vorbelegt, jetzt wird die der Inhalt/Wert des
@@ -209,7 +202,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 
 				oldValue = copyOfImagePixels[i];
 			}
-			quantilMap.put(new Integer(q[j]), new Float(oldValue));
+			quantilMap.put(value, oldValue);
 		}
 
 		// show statistics
@@ -223,7 +216,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 		textPanel.appendLine("stddev	" + stdDev);
 
 		for (int a = 0; a < quantilMap.size(); a++) {
-			textPanel.appendLine("quant(" + q[a] + " %)	" + quantilMap.get(new Integer(q[a])));
+			textPanel.appendLine("quant(" + q[a] + " %)	" + quantilMap.get(q[a]));
 		}
 		textPanel.appendLine("n_defined	" + (posp + negp + zero));
 		textPanel.appendLine("n_def_pos	" + posp);
@@ -231,11 +224,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 
 		JFrame tw = new JFrame("Statistics for linear interpolation");
 		JButton but = new JButton("Save as...");
-		but.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				textPanel.saveAs("");
-			}
-		});
+		but.addActionListener(e -> textPanel.saveAs(""));
 		BoxLayout box = new BoxLayout(tw.getContentPane(), BoxLayout.Y_AXIS);
 		tw.getContentPane().setLayout(box);
 		tw.getContentPane().add(textPanel);

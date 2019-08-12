@@ -20,7 +20,6 @@
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 import java.util.Stack;
-import java.util.TreeMap;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -32,8 +31,7 @@ import ij.process.ImageProcessor;
 
 public class Subtract_Triangle implements PlugInFilter {
 
-	static ImagePlus orgImg;
-	TreeMap quantilMap = new TreeMap();
+	private static ImagePlus orgImg;
 
 	public int setup(String arg, ImagePlus imp) {
 		orgImg = imp;
@@ -192,8 +190,8 @@ public class Subtract_Triangle implements PlugInFilter {
 		floatProcessor.setColorModel(cm);
 
 		// converting back if it was a 8-bit
-		ImagePlus byteImage = null;
-		ImagePlus ci = null;
+//		ImagePlus byteImage = null;
+//		ImagePlus ci = null;
 		/**
 		 * kh: Ich habe festgestellt, byte Bilder Rechen-Fehler bei der Auswertung
 		 * aufweisen kh: es spricht nichts dagegen, dass das Differenzbild float bleibt
@@ -202,7 +200,7 @@ public class Subtract_Triangle implements PlugInFilter {
 		 * byteImage = new ImagePlus("Sub Triangle of " + orgImg.getTitle(),bp); ci =
 		 * byteImage; byteImage.show(); } else {
 		 */
-		ci = floatImg;
+//		ci = floatImg;
 		floatImg.show();
 		// kh: }
 
@@ -217,13 +215,13 @@ public class Subtract_Triangle implements PlugInFilter {
 		IJ.showMessage("About SubstractTriangle...", "This PlugIn does linear interpolation!");
 	}
 
-	private class PolyTree {
+	private static class PolyTree {
 
 		private Polygon polygon;
 		private PolyTree left = null;
 		private PolyTree right = null;
 		private Gauss g = null;
-		private float[] colors = new float[3];
+		private final float[] colors = new float[3];
 
 		PolyTree(int[] x, int[] y, int length, ImageProcessor ip) {
 
@@ -280,7 +278,7 @@ public class Subtract_Triangle implements PlugInFilter {
 			int[] yCoords = new int[length];
 
 			int r = 0;
-			Stack stack = new Stack();
+			Stack<Point> stack = new Stack<>();
 			for (int i = 0; i < length; i++) {
 
 				if ((i % 2) == 0) { // equal nr
@@ -294,7 +292,7 @@ public class Subtract_Triangle implements PlugInFilter {
 			}
 			Point point;
 			while (!stack.empty()) {
-				point = (Point) stack.pop();
+				point = stack.pop();
 				xCoords[r] = point.x;
 				yCoords[r] = point.y;
 				r++;
@@ -329,7 +327,7 @@ public class Subtract_Triangle implements PlugInFilter {
 					sum = right.getWeight(x, y);
 					if (sum == -1) {
 						System.err.println("ERROR: Point (" + x + "/" + y + ") was not in Triangle!");
-						printArray("Bounding polygon was:", polygon.xpoints, polygon.ypoints, polygon.npoints);
+						printArray(polygon.xpoints, polygon.ypoints);
 						return -1;
 					} else {
 						return sum;
@@ -340,11 +338,11 @@ public class Subtract_Triangle implements PlugInFilter {
 			}
 		}
 
-		void printArray(String label, int[] x, int[] y, int length) {
-			System.out.println(label);
+		void printArray(int[] x, int[] y) {
+			System.out.println("Bounding polygon was:");
 			System.out.print("X: ");
-			for (int i = 0; i < x.length; i++) {
-				System.out.print(x[i] + "\t");
+			for (int value : x) {
+				System.out.print(value + "\t");
 			}
 			System.out.println();
 			System.out.print("Y: ");
