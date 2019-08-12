@@ -8,5 +8,115 @@
     <artifactId>KHKs_QLF</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>org.scijava</groupId>
+        <artifactId>pom-scijava</artifactId>
+        <version>26.0.0</version>
+        <relativePath />
+    </parent>
+
+    <name>QLF Plugin</name>
+    <description>Quantitative Light-induced Fluorescence</description>
+    <url>https://github.com/[MY-ORG]/[MY-REPO]</url>
+    <inceptionYear>2013</inceptionYear>
+    <organization>
+        <name>[MY-ORGANIZATION-NAME]</name>
+        <url>http://www.kunzelmann.de/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>CC0 1.0 Universal License</name>
+            <url>http://creativecommons.org/publicdomain/zero/1.0/</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>[MY-GITHUB-ID]</id>
+            <name>[MY-FULL-NAME]</name>
+            <url>https://imagej.net/User:[MY-IMAGEJ-WIKI-ACCOUNT]</url>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>None</name>
+        </contributor>
+    </contributors>
+
+    <mailingLists>
+        <mailingList>
+            <name>None</name>
+        </mailingList>
+    </mailingLists>
+
+    <scm>
+        <connection>scm:git:git://github.com/[MY-ORG]/[MY-REPO]</connection>
+        <developerConnection>scm:git:git@github.com:[MY-ORG]/[MY-REPO]</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/[MY-ORG]/[MY-REPO]</url>
+    </scm>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>http://github.com/[MY-ORG]/[MY-REPO]/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>None</system>
+    </ciManagement>
+
+
+    <properties>
+        <license.licenseName>cc0</license.licenseName>
+        <license.copyrightOwners>N/A</license.copyrightOwners>
+        <license.projectName>KHK_Color</license.projectName>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>scijava.public</id>
+            <url>https://maven.scijava.org/content/groups/public</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- ImageJ 1.x support. -->
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+        </dependency>
+
+        <!-- JUnit 5 support. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.5.1</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Fixes Maven JUnit 5 support. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <excludes>
+                        <exclude>some test to exclude here</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>
