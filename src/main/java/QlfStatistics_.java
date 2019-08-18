@@ -29,6 +29,7 @@ public class QlfStatistics_ implements PlugInFilter {
 
 	private static ImagePlus orgImg;
 	private final TreeMap<Integer, Float> quantilMap = new TreeMap<>();
+	final TextPanel textPanel = new TextPanel("Title");
 
 	public int setup(String arg, ImagePlus imp) {
 		orgImg = imp;
@@ -176,7 +177,6 @@ public class QlfStatistics_ implements PlugInFilter {
 		}
 
 		// show statistics
-		final TextPanel textPanel = new TextPanel("Title");
 		textPanel.setColumnHeadings("Beschreibung	Wert");
 		textPanel.appendLine("afile_name	" + orgImg.getTitle());
 
