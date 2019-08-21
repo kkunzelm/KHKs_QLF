@@ -23,60 +23,121 @@ import javax.swing.*;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.gui.GenericDialog;
 import ij.plugin.filter.PlugInFilter;
+import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 import ij.text.TextPanel;
 
 public class QlfStatistics_Stack implements PlugInFilter {
 
-	private ImagePlus imp;
+	final TextPanel textPanel = new TextPanel("Title");
 	private final TreeMap<Integer, Float> quantilMap = new TreeMap<>();
+	private ImagePlus imp;
+	// Dialog variables
+	private boolean processSingleImage = false;
+	private int selectedImageIndex = 0;
 
 	public int setup(String arg, ImagePlus imp) {
+		// convert images to Gray, 32 Bit float
+		try {
+			ImageConverter ic = new ImageConverter(imp);
+			ic.convertToGray32();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
 		this.imp = imp;
-		System.out.println("testpoint 1");
+		System.out.println("setup");
+
+		// if multiple images show image selection dialog
+		if (imp.getStackSize() > 1) {
+			showImageSelectionDialog();
+		}
+
 		return DOES_32;
 	}
 
+	private void showImageSelectionDialog() {
+		try {
+			GenericDialog dialog = new GenericDialog("Stack Selection");
+			dialog.addMessage(
+					"Select if statistics should be calculated for a single image or all images in the current stack.");
+			dialog.addCheckbox("Process single image", false);
+
+			// Image selection:
+			// Images in stacks do not have titles; therefore they have to be selected by index
+			String[] imageIndexes = new String[imp.getStackSize()];
+			for (int i = 0; i < imp.getStackSize(); i++) {
+				imageIndexes[i] = "Image " + (i + 1);
+			}
+			dialog.addChoice("Select Image", imageIndexes, imageIndexes[0]);
+
+			// Show dialog, the rest of the code is not executed before OK or Cancel is clicked
+			dialog.showDialog();
+
+			if (dialog.wasOKed()) {
+				processSingleImage = dialog.getNextBoolean();
+				selectedImageIndex = dialog.getNextChoiceIndex();
+			} else {
+			    // If dialog is canceled, process all images
+			    processSingleImage = false;
+            }
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
 	public void run(ImageProcessor ip) {
-		System.out.println("testpoint 2");
+		System.out.println("run()");
 
 		int posp = 0, negp = 0, zero = 0;
 
 		int width = ip.getWidth();
 		int height = ip.getHeight();
 
-		boolean isstack = (imp.getStackSize() != 1);
-		int length = width * height * imp.getStackSize(); // wenn es nur ein Bild ist, dann ist imp.getStackSize = 1;
-		System.out.println("imp.getStackSize: " + imp.getStackSize());
-		float[] copyOfImagePixels = new float[length];
+		boolean isStack = (imp.getStackSize() > 1);
+        System.out.println("imp.getStackSize: " + imp.getStackSize());
+		int length;
 
-		if (!isstack) {
+		float[] copyOfImagePixels;
+		float[] arrayOfImagePixels;
+
+		if (!isStack || processSingleImage) {
+			length = width * height; // Force to size of one image for processSingleImage
+			copyOfImagePixels = new float[length];
 
 			// define an array which referes to the pixels of the image
-
-			float[] arrayOfImagePixels = (float[]) ip.getPixels();
+			if (processSingleImage) {
+				arrayOfImagePixels = (float[]) imp.getImageStack().getProcessor(selectedImageIndex + 1).getPixels();
+			} else {
+				arrayOfImagePixels = (float[]) ip.getPixels();
+			}
 
 			// I will work on a copy of the array
 			// if we use this array then the image is changed after sorting
-
 			System.arraycopy(arrayOfImagePixels, 0, copyOfImagePixels, 0, length);
 
 		} else { // we have a stack, so loop through all ImageProcessors
-			System.out.println("testpoint 3");
+			length = width * height * imp.getStackSize(); // wenn es nur ein Bild ist, dann ist imp.getStackSize = 1;
+			copyOfImagePixels = new float[length];
+
+			System.out.println("process multiple images");
 			ImageStack stack = imp.getStack();
 
-			for (int z = 1; z <= imp.getStackSize(); z++) {
+			for (int imageIndex = 1; imageIndex <= imp.getStackSize(); imageIndex++) {
 
-				ImageProcessor theSlice = stack.getProcessor(z);
+				ImageProcessor theSlice = stack.getProcessor(imageIndex);
 				// define an array which referes to the pixels of the image
 
-				float[] arrayOfImagePixels = (float[]) theSlice.getPixels();
+				arrayOfImagePixels = (float[]) theSlice.getPixels();
 
 				// I will work on a copy of the array
 				// if we use this array then the image is changed after sorting
-				System.out.println("inner loop: z = " + z + " position z-1*width*height: " + (z - 1) * width * height);
-				System.arraycopy(arrayOfImagePixels, 0, copyOfImagePixels, (z - 1) * width * height, width * height);
+				System.out.println("inner loop: z = " + imageIndex + " position z-1*width*height: "
+						+ (imageIndex - 1) * width * height);
+				System.arraycopy(arrayOfImagePixels, 0, copyOfImagePixels, (imageIndex - 1) * width * height,
+						width * height);
 
 			}
 		}
@@ -84,7 +145,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 		// we need a sorted array for the quantile (n-tile) calculation
 
 		java.util.Arrays.sort(copyOfImagePixels);
-		System.out.println("testpoint 4");
+		System.out.println("array sorted");
 		// determine the number of positive, negative and zero pixels
 
 		for (int a = 0; a < length; a++) {
@@ -206,9 +267,13 @@ public class QlfStatistics_Stack implements PlugInFilter {
 		}
 
 		// show statistics
-		final TextPanel textPanel = new TextPanel("Title");
-		textPanel.setColumnHeadings("Beschreibung	Wert");
-		textPanel.appendLine("afile_name	" + imp.getTitle());
+		textPanel.setColumnHeadings("Description	Value");
+
+		// If a single image is selected from a stack: show image index in title
+		if (processSingleImage)
+			textPanel.appendLine("afile_name	" + imp.getTitle() + ", Image " + (selectedImageIndex + 1));
+		else
+			textPanel.appendLine("afile_name	" + imp.getTitle());
 
 		textPanel.appendLine("min	" + min);
 		textPanel.appendLine("max	" + max);
