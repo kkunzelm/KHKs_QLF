@@ -34,9 +34,11 @@ public class QlfStatistics_Stack implements PlugInFilter {
 	final TextPanel textPanel = new TextPanel("Title");
 	private final TreeMap<Integer, Float> quantilMap = new TreeMap<>();
 	private ImagePlus imp;
+
 	// Dialog variables
-	private boolean processSingleImage = false;
-	private int selectedImageIndex = 0;
+	boolean processSingleImage = false;
+	int selectedImageIndex = 0;
+	boolean showDialog = true; // set false for testing
 
 	public int setup(String arg, ImagePlus imp) {
 		// convert images to Gray, 32 Bit float
@@ -44,14 +46,14 @@ public class QlfStatistics_Stack implements PlugInFilter {
 			ImageConverter ic = new ImageConverter(imp);
 			ic.convertToGray32();
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.getMessage());
 		}
 
 		this.imp = imp;
 		System.out.println("setup");
 
 		// if multiple images show image selection dialog
-		if (imp.getStackSize() > 1) {
+		if (imp.getStackSize() > 1 && showDialog) {
 			showImageSelectionDialog();
 		}
 
@@ -84,7 +86,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 			    processSingleImage = false;
             }
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.getMessage());
 		}
 	}
 
