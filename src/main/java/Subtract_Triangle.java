@@ -27,6 +27,7 @@ import ij.gui.NewImage;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.plugin.filter.PlugInFilter;
+import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
 public class Subtract_Triangle implements PlugInFilter {
@@ -34,6 +35,15 @@ public class Subtract_Triangle implements PlugInFilter {
 	private static ImagePlus orgImg;
 
 	public int setup(String arg, ImagePlus imp) {
+
+		// convert images to Gray, 32 Bit float
+		try {
+			ImageConverter ic = new ImageConverter(imp);
+			ic.convertToGray32();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
 		orgImg = imp;
 		return DOES_8G + DOES_32 + ROI_REQUIRED;
 	}
@@ -41,12 +51,6 @@ public class Subtract_Triangle implements PlugInFilter {
 	public void run(ImageProcessor ip) {
 
 		Rectangle rectRoi = ip.getRoi();
-
-		boolean isByte = false;
-		if (orgImg.getType() == ImagePlus.GRAY8) {
-			ip = ip.convertToFloat(); // if its 8-bit make 32-bit (methods ONLY running on float!)
-			isByte = true; // for converting back if needed
-		}
 
 		// KH 23.2.2006: habe bei dieser Abfrage Polyline durch Polygon ersetzt. Jetzt
 		// geht das Diff.Bild
