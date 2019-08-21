@@ -215,7 +215,7 @@ public class Subtract_Triangle implements PlugInFilter {
 		IJ.showMessage("About SubstractTriangle...", "This PlugIn does linear interpolation!");
 	}
 
-	private static class PolyTree {
+	static class PolyTree {
 
 		private Polygon polygon;
 		private PolyTree left = null;
