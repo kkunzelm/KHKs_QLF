@@ -215,7 +215,7 @@ public class QlfStatistics_Stack implements PlugInFilter {
 		 *
 		 * While the above used method to calculate the standard deviation is correct in
 		 * theory and will often work well enough, it is extremely vulnerable to the
-		 * effects of roundoff error in computer floating point operations. It is
+		 * effects of round off errors in computer floating point operations. It is
 		 * possible to end up taking the square root of a negative number! The problem,
 		 * together with a better solution, is described in Donald Knuth's
 		 * "The Art of Computer Programming, Volume 2: Seminumerical Algorithms",
