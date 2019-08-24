@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ij.ImagePlus;
@@ -35,7 +36,7 @@ public class PolyTreeTest {
 		setupTest();
 
 		// Build Poly Tree
-		Subtract_Triangle.PolyTree polyTree = new Subtract_Triangle.PolyTree(xPolyCoords, yPolyCoords, 4,
+		PolyTree polyTree = new PolyTree(xPolyCoords, yPolyCoords, 4,
 				imagePlus.getProcessor());
 
         // Test weight at coordinates inside polygon
@@ -47,7 +48,7 @@ public class PolyTreeTest {
 		setupTest();
 
         // Build Poly Tree
-		Subtract_Triangle.PolyTree polyTree = new Subtract_Triangle.PolyTree(xPolyCoords, yPolyCoords, 4,
+		PolyTree polyTree = new PolyTree(xPolyCoords, yPolyCoords, 4,
 				imagePlus.getProcessor());
 
 		// Test weight at coordinates outside polygon
