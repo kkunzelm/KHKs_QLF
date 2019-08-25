@@ -3,6 +3,11 @@ language: java
 sudo: false # faster builds
 jdk: openjdk8
 
+# virtual display variable for gui tests
+dist: xenial
+services:
+  - xvfb
+
 # maven
 install: true
 script: mvn clean verify
